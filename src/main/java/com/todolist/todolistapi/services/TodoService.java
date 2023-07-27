@@ -4,7 +4,9 @@ import com.todolist.todolistapi.dtos.TodoRequestDTO;
 import com.todolist.todolistapi.dtos.TodoResponseDTO;
 import com.todolist.todolistapi.entities.Todo;
 import com.todolist.todolistapi.enums.Status;
+import com.todolist.todolistapi.exceptions.TodoNotFoundException;
 import com.todolist.todolistapi.repositories.TodoRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,5 +37,17 @@ public class TodoService {
         Todo todoSaved = todoRepository.save(todo);
 
         return new TodoResponseDTO(todoSaved);
+    }
+
+    @Transactional
+    public TodoResponseDTO update(String id, TodoRequestDTO todoRequestDTO) {
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
+
+        BeanUtils.copyProperties(todoRequestDTO, todo);
+
+        Todo todoUpdated = todoRepository.save(todo);
+
+        return new TodoResponseDTO(todoUpdated);
     }
 }
