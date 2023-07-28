@@ -34,4 +34,9 @@ public class TodoController {
     public ResponseEntity<TodoResponseDTO> updateTodo(@PathVariable String id, @RequestBody @Valid TodoRequestDTO todoRequestDTO) {
         return ResponseEntity.ok().body(todoService.update(id, todoRequestDTO));
     }
+
+    @PutMapping(value = "/complete/{id}")
+    public ResponseEntity<TodoResponseDTO> updateStatus(@PathVariable String id) {
+        return ResponseEntity.ok().body(todoService.updateStatusToCompleted(id));
+    }
 }

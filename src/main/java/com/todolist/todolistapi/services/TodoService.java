@@ -23,7 +23,7 @@ public class TodoService {
 
     @Transactional(readOnly = true)
     public List<TodoResponseDTO> getAllByUserId(String id) {
-        return todoRepository.findByUserId(id)
+        return todoRepository.findByUserIdAndStatusEqual(id, Status.PENDENTE)
                 .stream()
                 .map(TodoResponseDTO::new)
                 .toList();
@@ -45,6 +45,18 @@ public class TodoService {
                 .orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
 
         BeanUtils.copyProperties(todoRequestDTO, todo);
+
+        Todo todoUpdated = todoRepository.save(todo);
+
+        return new TodoResponseDTO(todoUpdated);
+    }
+
+    @Transactional
+    public TodoResponseDTO updateStatusToCompleted(String id) {
+        Todo todo = todoRepository.findById(id)
+                .orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
+
+        todo.setStatus(Status.CONCLUIDA);
 
         Todo todoUpdated = todoRepository.save(todo);
 
