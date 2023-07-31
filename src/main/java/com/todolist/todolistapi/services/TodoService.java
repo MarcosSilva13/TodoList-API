@@ -41,8 +41,7 @@ public class TodoService {
 
     @Transactional
     public TodoResponseDTO update(String id, TodoRequestDTO todoRequestDTO) {
-        Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
+        Todo todo = this.findTodo(id);
 
         BeanUtils.copyProperties(todoRequestDTO, todo);
 
@@ -53,13 +52,22 @@ public class TodoService {
 
     @Transactional
     public TodoResponseDTO updateStatusToCompleted(String id) {
-        Todo todo = todoRepository.findById(id)
-                .orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
-
+        Todo todo = this.findTodo(id);
         todo.setStatus(Status.CONCLUIDA);
 
         Todo todoUpdated = todoRepository.save(todo);
 
         return new TodoResponseDTO(todoUpdated);
+    }
+
+    @Transactional
+    public void delete(String id) {
+        Todo todo = this.findTodo(id);
+
+        todoRepository.delete(todo);
+    }
+
+    private Todo findTodo(String id) {
+        return todoRepository.findById(id).orElseThrow(() -> new TodoNotFoundException("Tarefa não encontrada!"));
     }
 }
