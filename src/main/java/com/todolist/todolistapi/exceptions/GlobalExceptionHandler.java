@@ -3,6 +3,7 @@ package com.todolist.todolistapi.exceptions;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -15,18 +16,18 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private ExceptionDetails details = new ExceptionDetails();
+
     @ExceptionHandler(TodoNotFoundException.class)
     public ResponseEntity<ExceptionDetails> todoNotFoundExceptionHandler(TodoNotFoundException ex,
                                                                          HttpServletRequest request) {
-        ExceptionDetails details = new ExceptionDetails();
-
         details.setMessage(ex.getMessage());
         details.setStatus(HttpStatus.NOT_FOUND.value());
         details.setError(HttpStatus.NOT_FOUND.name());
         details.setTimestamp(LocalDateTime.now());
         details.setPath(request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(details);
+        return ResponseEntity.status(details.getStatus()).body(details);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -49,5 +50,41 @@ public class GlobalExceptionHandler {
         details.setFieldsMessage(fieldsMessage);
 
         return ResponseEntity.status(ex.getStatusCode()).body(details);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionDetails> userNotFoundExceptionHandler(UserNotFoundException ex,
+                                                                                 HttpServletRequest request) {
+        details.setMessage(ex.getMessage());
+        details.setStatus(HttpStatus.NOT_FOUND.value());
+        details.setError(HttpStatus.NOT_FOUND.name());
+        details.setTimestamp(LocalDateTime.now());
+        details.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(details.getStatus()).body(details);
+    }
+
+    @ExceptionHandler(EmailInUseException.class)
+    public ResponseEntity<ExceptionDetails> emailInUseExceptionHandler(EmailInUseException ex,
+                                                                       HttpServletRequest request) {
+        details.setMessage(ex.getMessage());
+        details.setStatus(HttpStatus.CONFLICT.value());
+        details.setError(HttpStatus.CONFLICT.name());
+        details.setTimestamp(LocalDateTime.now());
+        details.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(details.getStatus()).body(details);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionDetails> badCredentialsExceptionHandler(BadCredentialsException ex,
+                                                                           HttpServletRequest request) {
+        details.setMessage(ex.getMessage());
+        details.setStatus(HttpStatus.BAD_REQUEST.value());
+        details.setError(HttpStatus.BAD_REQUEST.name());
+        details.setTimestamp(LocalDateTime.now());
+        details.setPath(request.getRequestURI());
+
+        return ResponseEntity.status(details.getStatus()).body(details);
     }
 }
