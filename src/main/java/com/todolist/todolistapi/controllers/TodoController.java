@@ -20,9 +20,9 @@ public class TodoController {
         this.todoService = todoService;
     }
 
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<List<TodoResponseDTO>> getAllTodos(@PathVariable String id) {
-        return ResponseEntity.ok().body(todoService.getAllByUserId(id));
+    @GetMapping
+    public ResponseEntity<List<TodoResponseDTO>> getAllTodos() {
+        return ResponseEntity.ok().body(todoService.getAllByUserId());
     }
 
     @PostMapping

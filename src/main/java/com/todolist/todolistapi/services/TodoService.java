@@ -3,10 +3,12 @@ package com.todolist.todolistapi.services;
 import com.todolist.todolistapi.dtos.TodoRequestDTO;
 import com.todolist.todolistapi.dtos.TodoResponseDTO;
 import com.todolist.todolistapi.entities.Todo;
+import com.todolist.todolistapi.entities.User;
 import com.todolist.todolistapi.enums.Status;
 import com.todolist.todolistapi.exceptions.TodoNotFoundException;
 import com.todolist.todolistapi.repositories.TodoRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +24,10 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public List<TodoResponseDTO> getAllByUserId(String id) {
-        return todoRepository.findByUserIdAndStatusEqual(id, Status.PENDENTE)
+    public List<TodoResponseDTO> getAllByUserId() {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return todoRepository.findByUserIdAndStatusEqual(user.getId(), Status.PENDENTE)
                 .stream()
                 .map(TodoResponseDTO::new)
                 .toList();
@@ -31,7 +35,9 @@ public class TodoService {
 
     @Transactional
     public TodoResponseDTO save(TodoRequestDTO todoRequestDTO) {
-        Todo todo = new Todo(todoRequestDTO);
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Todo todo = new Todo(todoRequestDTO, user);
         todo.setStatus(Status.PENDENTE);
 
         Todo todoSaved = todoRepository.save(todo);

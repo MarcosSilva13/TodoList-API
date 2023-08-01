@@ -36,10 +36,10 @@ public class Todo {
         this.user = user;
     }
 
-    public Todo(TodoRequestDTO todoRequestDTO) {
+    public Todo(TodoRequestDTO todoRequestDTO, User user) {
         this.title = todoRequestDTO.title();
         this.description = todoRequestDTO.description();
-        this.user = new User(todoRequestDTO.userId());
+        this.user = user;
     }
 
     public String getId() {
