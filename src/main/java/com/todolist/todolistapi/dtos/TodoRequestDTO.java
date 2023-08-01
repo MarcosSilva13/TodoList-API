@@ -7,7 +7,5 @@ public record TodoRequestDTO(
         String title,
 
         @NotBlank(message = "O campo descrição não pode estar vazio.")
-        String description,
-
-        String userId) {
+        String description) {
 }
