@@ -24,10 +24,15 @@ public class TodoService {
     }
 
     @Transactional(readOnly = true)
-    public List<TodoResponseDTO> getAllByUserId() {
+    public List<TodoResponseDTO> getAllByUserId(String status) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Status statusEnum = Status.PENDENTE;
 
-        return todoRepository.findByUserIdAndStatusEqual(user.getId(), Status.PENDENTE)
+        if (status.equals("completed")) {
+            statusEnum = Status.CONCLUIDA;
+        }
+
+        return todoRepository.findByUserIdAndStatusEqual(user.getId(), statusEnum)
                 .stream()
                 .map(TodoResponseDTO::new)
                 .toList();
