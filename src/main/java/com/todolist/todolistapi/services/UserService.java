@@ -1,8 +1,6 @@
 package com.todolist.todolistapi.services;
 
-import com.todolist.todolistapi.dtos.UserRequestDTO;
 import com.todolist.todolistapi.dtos.UserResponseDTO;
-import com.todolist.todolistapi.entities.User;
 import com.todolist.todolistapi.repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +23,5 @@ public class UserService {
                 .stream()
                 .map(UserResponseDTO::new)
                 .toList();
-    }
-
-    @Transactional
-    public UserResponseDTO save(UserRequestDTO userRequestDTO) {
-        User user = new User(userRequestDTO);
-
-        User userSaved = userRepository.save(user);
-
-        return new UserResponseDTO(userSaved);
     }
 }
