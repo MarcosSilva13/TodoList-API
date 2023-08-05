@@ -8,10 +8,12 @@ import com.todolist.todolistapi.enums.Status;
 import com.todolist.todolistapi.exceptions.TodoNotFoundException;
 import com.todolist.todolistapi.repositories.TodoRepository;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,7 +34,8 @@ public class TodoService {
             statusEnum = Status.CONCLUIDA;
         }
 
-        return todoRepository.findByUserIdAndStatusEqual(user.getId(), statusEnum)
+        return todoRepository.findByUserIdAndStatusEqual(user.getId(), statusEnum,
+                        Sort.by(Sort.Direction.DESC, "createdAt"))
                 .stream()
                 .map(TodoResponseDTO::new)
                 .toList();
@@ -44,6 +47,7 @@ public class TodoService {
 
         Todo todo = new Todo(todoRequestDTO, user);
         todo.setStatus(Status.PENDENTE);
+        todo.setCreatedAt(LocalDateTime.now());
 
         Todo todoSaved = todoRepository.save(todo);
 
