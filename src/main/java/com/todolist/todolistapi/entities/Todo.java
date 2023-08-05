@@ -4,6 +4,8 @@ import com.todolist.todolistapi.dtos.TodoRequestDTO;
 import com.todolist.todolistapi.enums.Status;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "tb_todos")
 public class Todo {
@@ -21,6 +23,9 @@ public class Todo {
     @Column(nullable = false, length = 10)
     private Status status;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -28,11 +33,12 @@ public class Todo {
     public Todo() {
     }
 
-    public Todo(String id, String title, String description, Status status, User user) {
+    public Todo(String id, String title, String description, Status status, LocalDateTime createdAt, User user) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
+        this.createdAt = createdAt;
         this.user = user;
     }
 
@@ -72,6 +78,14 @@ public class Todo {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public User getUser() {
