@@ -1,6 +1,5 @@
 package com.todolist.todolistapi.services;
 
-import com.todolist.todolistapi.exceptions.UserNotFoundException;
 import com.todolist.todolistapi.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -19,6 +18,6 @@ public class AuthorizationService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado."));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
     }
 }
