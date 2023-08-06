@@ -2,7 +2,6 @@ package com.todolist.todolistapi.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 
 public record UserRequestDTO(
         @NotBlank(message = "O campo nome não pode estar vazio.")
