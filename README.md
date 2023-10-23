@@ -15,6 +15,21 @@
   🔹<strong> Maven </strong><br>
 </p>
 
+<h2>Requisitos</h2>
+
+- Necessário ter o Java 17 e o MySQL instalados em sua máquina.
+
+<h2>Instalação</h2>
+
+- Clone o repositório:
+
+```bash
+git clone https://github.com/MarcosSilva13/TodoList-API
+```
+- Abra a pasta TodoList-API na IDE IntelliJ e instale as dependências com o Maven.<br>
+- Abra o arquivo `TodolistApiApplication.java` e pressione `Shift+F10` para executar, ou clique no icone ▶️ de execução.
+- A aplicação estará disponível no endereço: http://localhost:8080
+
 <h2> Endpoints - Autenticação </h2>
 
 <h3>🔹POST🔹</h3>
