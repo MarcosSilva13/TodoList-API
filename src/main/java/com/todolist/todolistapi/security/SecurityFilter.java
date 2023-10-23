@@ -53,7 +53,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                 ObjectMapper mapper = new ObjectMapper();
 
                 response.setStatus(errorDTO.status());
-                response.setContentType("aaplication/json");
+                response.setContentType("application/json");
                 response.getWriter().print(mapper.writeValueAsString(errorDTO));
                 response.getWriter().flush();
                 return;
