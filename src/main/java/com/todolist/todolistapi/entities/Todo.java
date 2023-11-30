@@ -33,15 +33,6 @@ public class Todo {
     public Todo() {
     }
 
-    public Todo(String id, String title, String description, Status status, LocalDateTime createdAt, User user) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.user = user;
-    }
-
     public Todo(TodoRequestDTO todoRequestDTO, User user) {
         this.title = todoRequestDTO.title();
         this.description = todoRequestDTO.description();
