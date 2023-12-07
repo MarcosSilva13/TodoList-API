@@ -1,91 +1,69 @@
 package com.todolist.todolistapi.exceptions;
 
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
-@ControllerAdvice
-public class GlobalExceptionHandler {
-
-    private ExceptionDetails details = new ExceptionDetails();
+@RestControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TodoNotFoundException.class)
-    public ResponseEntity<ExceptionDetails> todoNotFoundExceptionHandler(TodoNotFoundException ex,
-                                                                         HttpServletRequest request) {
-        details.setMessage(ex.getMessage());
-        details.setStatus(HttpStatus.NOT_FOUND.value());
-        details.setError(HttpStatus.NOT_FOUND.name());
-        details.setTimestamp(LocalDateTime.now());
-        details.setPath(request.getRequestURI());
+    public ResponseEntity<ProblemDetail> todoNotFoundExceptionHandler(TodoNotFoundException ex) {
+        ProblemDetail problemDetail = this.getProblemDetail(HttpStatus.NOT_FOUND, ex.getMessage());
 
-        return ResponseEntity.status(details.getStatus()).body(details);
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ValidationExceptionDetails> methodArgumentNotValidExceptionHandler(
-            MethodArgumentNotValidException ex, HttpServletRequest request) {
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        List<String> fieldsMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(FieldError::getDefaultMessage)
+                .toList();
 
-        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+        ProblemDetail problemDetail = ProblemDetail.forStatus(ex.getStatusCode());
+        problemDetail.setDetail("Campos não preenchidos corretamente.");
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+        problemDetail.setProperty("fieldsMessage", fieldsMessage);
 
-        String fields = fieldErrors.stream().map(FieldError::getField).collect(Collectors.joining(", "));
-
-        String fieldsMessage = fieldErrors.stream().map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
-
-        ValidationExceptionDetails details = new ValidationExceptionDetails();
-        details.setMessage("Campos não preenchidos corretamente!");
-        details.setStatus(ex.getStatusCode().value());
-        details.setError(HttpStatus.valueOf(ex.getStatusCode().value()).name());
-        details.setTimestamp(LocalDateTime.now());
-        details.setPath(request.getRequestURI());
-        details.setFields(fields);
-        details.setFieldsMessage(fieldsMessage);
-
-        return ResponseEntity.status(ex.getStatusCode()).body(details);
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ExceptionDetails> usernameNotFoundExceptionHandler(UsernameNotFoundException ex,
-                                                                                 HttpServletRequest request) {
-        details.setMessage(ex.getMessage());
-        details.setStatus(HttpStatus.NOT_FOUND.value());
-        details.setError(HttpStatus.NOT_FOUND.name());
-        details.setTimestamp(LocalDateTime.now());
-        details.setPath(request.getRequestURI());
+    public ResponseEntity<ProblemDetail> usernameNotFoundExceptionHandler(UsernameNotFoundException ex) {
+        ProblemDetail problemDetail = this.getProblemDetail(HttpStatus.NOT_FOUND, ex.getMessage());
 
-        return ResponseEntity.status(details.getStatus()).body(details);
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
     @ExceptionHandler(EmailInUseException.class)
-    public ResponseEntity<ExceptionDetails> emailInUseExceptionHandler(EmailInUseException ex,
-                                                                       HttpServletRequest request) {
-        details.setMessage(ex.getMessage());
-        details.setStatus(HttpStatus.CONFLICT.value());
-        details.setError(HttpStatus.CONFLICT.name());
-        details.setTimestamp(LocalDateTime.now());
-        details.setPath(request.getRequestURI());
+    public ResponseEntity<ProblemDetail> emailInUseExceptionHandler(EmailInUseException ex) {
+        ProblemDetail problemDetail = this.getProblemDetail(HttpStatus.CONFLICT, ex.getMessage());
 
-        return ResponseEntity.status(details.getStatus()).body(details);
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ExceptionDetails> badCredentialsExceptionHandler(BadCredentialsException ex,
-                                                                           HttpServletRequest request) {
-        details.setMessage(ex.getMessage());
-        details.setStatus(HttpStatus.BAD_REQUEST.value());
-        details.setError(HttpStatus.BAD_REQUEST.name());
-        details.setTimestamp(LocalDateTime.now());
-        details.setPath(request.getRequestURI());
+    public ResponseEntity<ProblemDetail> badCredentialsExceptionHandler(BadCredentialsException ex) {
+        ProblemDetail problemDetail = this.getProblemDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
 
-        return ResponseEntity.status(details.getStatus()).body(details);
+        return ResponseEntity.status(problemDetail.getStatus()).body(problemDetail);
+    }
+
+    private ProblemDetail getProblemDetail(HttpStatus status, String message) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(status, message);
+        problemDetail.setProperty("timestamp", LocalDateTime.now());
+
+        return problemDetail;
     }
 }
