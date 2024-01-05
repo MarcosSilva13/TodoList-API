@@ -37,18 +37,21 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         String token = this.recoverToken(request);
 
-        if (token != null) {
-            String subject = tokenService.validateToken(token);
-            Optional<UserDetails> user = userRepository.findByEmail(subject);
+        try {
+            if (token != null) {
+                String subject = tokenService.validateToken(token);
+                Optional<UserDetails> user = userRepository.findByEmail(subject);
 
-            if (user.isPresent()) {
-                var authetication = new UsernamePasswordAuthenticationToken(user.get(), null,
-                        user.get().getAuthorities());
+                if (user.isPresent()) {
+                    var authetication = new UsernamePasswordAuthenticationToken(user.get(), null,
+                            user.get().getAuthorities());
 
-                SecurityContextHolder.getContext().setAuthentication(authetication);
-            } else {
-                ErrorDTO errorDTO = new ErrorDTO("Usuário não autenticado ou token expirado.",
-                        HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.name(), LocalDateTime.now().toString());
+                    SecurityContextHolder.getContext().setAuthentication(authetication);
+                }
+            }
+        } catch (RuntimeException ex) {
+                ErrorDTO errorDTO = new ErrorDTO(HttpStatus.UNAUTHORIZED.name(), HttpStatus.UNAUTHORIZED.value(),
+                        ex.getMessage(), request.getRequestURI(), LocalDateTime.now().toString());
 
                 ObjectMapper mapper = new ObjectMapper();
 
@@ -57,7 +60,6 @@ public class SecurityFilter extends OncePerRequestFilter {
                 response.getWriter().print(mapper.writeValueAsString(errorDTO));
                 response.getWriter().flush();
                 return;
-            }
         }
         filterChain.doFilter(request, response);
     }
